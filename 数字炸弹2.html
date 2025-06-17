@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数字炸弹游戏 - 多人版</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#165DFF',
+                        secondary: '#FF5252',
+                        neutral: '#6B7280',
+                        dark: '#1F2937',
+                        light: '#F9FAFB',
+                        player1: '#165DFF', // 蓝色
+                        player2: '#36D399', // 绿色
+                        player3: '#A855F7', // 紫色
+                        player4: '#EC4899', // 粉色
+                        player5: '#F97316', // 橙色
+                        player6: '#FBBF24', // 黄色
+                        player7: '#06B6D4', // 青色
+                        player8: '#8B5CF6', // 靛蓝色
+                        player9: '#EC4899', // 紫红色
+                        player10: '#10B981', // 薄荷绿
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .bg-gradient-primary {
+                background: linear-gradient(135deg, #165DFF 0%, #0040C1 100%);
+            }
+            .bg-gradient-secondary {
+                background: linear-gradient(135deg, #FF5252 0%, #D32F2F 100%);
+            }
+            .animate-pulse-slow {
+                animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+            }
+            .animate-shake {
+                animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+            }
+            @keyframes shake {
+                10%, 90% { transform: translate3d(-1px, 0, 0); }
+                20%, 80% { transform: translate3d(2px, 0, 0); }
+                30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+                40%, 60% { transform: translate3d(4px, 0, 0); }
+            }
+            .player-active {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 25px -5px rgba(22, 93, 255, 0.4);
+                border-color: #165DFF !important;
+            }
+            .glass-effect {
+                backdrop-filter: blur(10px);
+                background-color: rgba(255, 255, 255, 0.7);
+            }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen font-inter text-dark">
+    <div class="container mx-auto px-4 py-8 max-w-5xl">
+        <!-- 游戏标题 -->
+        <header class="text-center mb-8 transform transition-all duration-500 hover:scale-105">
+            <h1 class="text-[clamp(2.2rem,5vw,3.8rem)] font-bold text-primary mb-2 text-shadow">
+                <i class="fa fa-bomb text-secondary animate-pulse-slow"></i> 数字炸弹
+            </h1>
+            <p class="text-neutral text-lg">多人版 - 猜中炸弹者受罚！</p>
+        </header>
+
+        <!-- 游戏卡片 -->
+        <div class="bg-white rounded-3xl shadow-2xl overflow-hidden transition-all duration-500 hover:shadow-3xl">
+            <!-- 游戏说明 -->
+            <div class="bg-gradient-primary text-white p-8 relative overflow-hidden">
+                <div class="absolute -right-10 -top-10 w-40 h-40 bg-white/10 rounded-full"></div>
+                <div class="absolute -left-20 -bottom-10 w-60 h-60 bg-white/5 rounded-full"></div>
+                
+                <h2 class="text-2xl font-bold mb-4 flex items-center">
+                    <i class="fa fa-info-circle mr-2"></i> 多人游戏规则
+                </h2>
+                <ul class="space-y-3 relative z-10">
+                    <li class="flex items-start group">
+                        <i class="fa fa-check-circle mt-1 mr-3 text-green-300 group-hover:text-green-200 transition-colors"></i>
+                        <span>系统会在1-100之间随机选择一个数字作为"炸弹"</span>
+                    </li>
+                    <li class="flex items-start group">
+                        <i class="fa fa-check-circle mt-1 mr-3 text-green-300 group-hover:text-green-200 transition-colors"></i>
+                        <span>玩家轮流猜测一个数字，范围会随着猜测逐渐缩小</span>
+                    </li>
+                    <li class="flex items-start group">
+                        <i class="fa fa-check-circle mt-1 mr-3 text-green-300 group-hover:text-green-200 transition-colors"></i>
+                        <span>如果猜中"炸弹"，该玩家输了，接受惩罚</span>
+                    </li>
+                    <li class="flex items-start group">
+                        <i class="fa fa-check-circle mt-1 mr-3 text-green-300 group-hover:text-green-200 transition-colors"></i>
+                        <span>游戏继续直到有人猜中炸弹为止</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- 游戏设置 -->
+            <div id="game-setup" class="p-8">
+                <h3 class="text-xl font-bold mb-6 flex items-center">
+                    <i class="fa fa-cog mr-2 text-primary"></i> 游戏设置
+                </h3>
+                
+                <!-- 玩家数量选择 -->
+                <div class="mb-8">
+                    <label class="block text-sm font-medium text-neutral mb-3">玩家数量</label>
+                    <div class="grid grid-cols-5 gap-3">
+                        <label class="relative cursor-pointer">
+                            <input type="radio" name="player-count" value="2" class="sr-only peer" checked>
+                            <div class="w-full h-16 rounded-xl border-2 border-gray-200 peer-checked:border-primary peer-checked:bg-primary/5 flex items-center justify-center transition-all duration-300 hover:bg-gray-50">
+                                <span class="font-medium">2 人</span>
+                            </div>
+                        </label>
+                        <label class="relative cursor-pointer">
+                            <input type="radio" name="player-count" value="3" class="sr-only peer">
+                            <div class="w-full h-16 rounded-xl border-2 border-gray-200 peer-checked:border-primary peer-checked:bg-primary/5 flex items-center justify-center transition-all duration-300 hover:bg-gray-50">
+                                <span class="font-medium">3 人</span>
+                            </div>
+                        </label>
+                        <label class="relative cursor-pointer">
+                            <input type="radio" name="player-count" value="4" class="sr-only peer">
+                            <div class="w-full h-16 rounded-xl border-2 border-gray-200 peer-checked:border-primary peer-checked:bg-primary/5 flex items-center justify-center transition-all duration-300 hover:bg-gray-50">
+                                <span class="font-medium">4 人</span>
+                            </div>
+                        </label>
+                        <label class="relative cursor-pointer">
+                            <input type="radio" name="player-count" value="8" class="sr-only peer">
+                            <div class="w-full h-16 rounded-xl border-2 border-gray-200 peer-checked:border-primary peer-checked:bg-primary/5 flex items-center justify-center transition-all duration-300 hover:bg-gray-50">
+                                <span class="font-medium">8 人</span>
+                            </div>
+                        </label>
+                        <label class="relative cursor-pointer">
+                            <input type="radio" name="player-count" value="10" class="sr-only peer">
+                            <div class="w-full h-16 rounded-xl border-2 border-gray-200 peer-checked:border-primary peer-checked:bg-primary/5 flex items-center justify-center transition-all duration-300 hover:bg-gray-50">
+                                <span class="font-medium">10 人</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- 玩家命名 -->
+                <div id="player-names" class="mb-8">
+                    <h4 class="text-lg font-semibold mb-4 flex items-center">
+                        <i class="fa fa-users mr-2 text-primary"></i> 玩家名称
+                    </h4>
+                    <div id="player-name-inputs" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- 玩家输入框将由JS动态生成 -->
+                    </div>
+                </div>
+                
+                <!-- 开始游戏按钮 -->
+                <div class="text-center">
+                    <button id="start-game-btn" class="bg-gradient-primary text-white px-10 py-4 rounded-2xl transition-all duration-300 hover:shadow-lg hover:shadow-primary/30 flex items-center mx-auto justify-center text-lg font-medium transform hover:-translate-y-1">
+                        <i class="fa fa-play mr-3"></i> 开始游戏
+                    </button>
+                </div>
+            </div>
+
+            <!-- 游戏区域 -->
+            <div id="game-area" class="hidden p-8">
+                <!-- 玩家状态 -->
+                <div id="player-status" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-10 gap-4 mb-8">
+                    <!-- 玩家卡片将由JS动态生成 -->
+                </div>
+
+                <!-- 游戏状态 -->
+                <div class="mb-8 bg-gray-50 rounded-2xl p-6">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <p class="text-sm text-neutral mb-1">当前范围</p>
+                            <p id="range-display" class="text-3xl font-bold text-primary">1 - 100</p>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fa fa-clock-o text-neutral mr-2"></i>
+                            <span id="game-time" class="text-neutral">00:00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 猜测输入 -->
+                <div class="mb-8">
+                    <label for="guess-input" id="current-player-label" class="block text-sm font-medium text-neutral mb-3">
+                        <span id="current-player-name">玩家1</span>，请输入你的猜测 (1-100)
+                    </label>
+                    <div class="flex">
+                        <input type="number" id="guess-input" min="1" max="100" class="flex-1 px-5 py-4 border-2 border-gray-200 rounded-l-2xl focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all text-lg" placeholder="输入数字...">
+                        <button id="guess-btn" class="bg-gradient-primary hover:bg-gradient-to-r hover:from-primary hover:to-primary/80 text-white px-8 py-4 rounded-r-2xl transition-all duration-300 flex items-center justify-center text-lg font-medium">
+                            <i class="fa fa-paper-plane mr-2"></i> 猜测
+                        </button>
+                    </div>
+                    <p id="error-message" class="text-red-500 text-sm mt-2 hidden">请输入1-100之间的数字，且在当前范围内</p>
+                </div>
+
+                <!-- 猜测历史 -->
+                <div class="mb-8">
+                    <h3 class="text-lg font-bold mb-3 flex items-center">
+                        <i class="fa fa-history mr-2 text-primary"></i> 猜测历史
+                    </h3>
+                    <div id="guess-history" class="min-h-[120px] bg-gray-50 rounded-2xl p-5 overflow-y-auto max-h-[240px]">
+                        <p class="text-center text-neutral italic">游戏开始后，猜测记录将显示在这里</p>
+                    </div>
+                </div>
+
+                <!-- 游戏结果 -->
+                <div id="game-result" class="hidden mb-8 p-8 rounded-2xl text-center bg-gradient-secondary/10 border border-secondary/20">
+                    <div id="lose-message">
+                        <div class="inline-flex items-center justify-center w-20 h-20 bg-secondary/20 rounded-full mb-4">
+                            <i class="fa fa-bomb text-4xl text-secondary animate-pulse"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-3 text-dark">游戏结束！</h3>
+                        <p id="loser-message" class="text-xl font-bold text-dark mb-4">
+                            <span id="loser-name" class="text-secondary">玩家1</span> 猜中了数字炸弹！
+                        </p>
+                        <p id="bomb-number" class="text-xl font-bold text-dark">炸弹数字是：<span class="text-secondary">?</span></p>
+                    </div>
+                </div>
+
+                <!-- 重新开始按钮 -->
+                <div id="restart-btn-container" class="hidden text-center">
+                    <button id="restart-btn" class="bg-gradient-secondary text-white px-10 py-4 rounded-2xl transition-all duration-300 hover:shadow-lg hover:shadow-secondary/30 flex items-center mx-auto justify-center text-lg font-medium transform hover:-translate-y-1">
+                        <i class="fa fa-refresh mr-3"></i> 重新开始
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 页脚 -->
+        <footer class="text-center text-neutral mt-8 text-sm">
+            <p>© 2025 数字炸弹游戏 | 多人版</p>
+        </footer>
+    </div>
+
+    <script>
+        // 游戏状态
+        let gameState = {
+            min: 1,
+            max: 100,
+            bomb: null,
+            players: [],
+            currentPlayerIndex: 0,
+            history: [],
+            gameOver: false,
+            startTime: null,
+            timer: null
+        };
+
+        // DOM元素
+        const gameSetup = document.getElementById('game-setup');
+        const gameArea = document.getElementById('game-area');
+        const startGameBtn = document.getElementById('start-game-btn');
+        const playerCountRadios = document.querySelectorAll('input[name="player-count"]');
+        const playerNameInputs = document.getElementById('player-name-inputs');
+        const playerStatus = document.getElementById('player-status');
+        const rangeDisplay = document.getElementById('range-display');
+        const currentPlayerLabel = document.getElementById('current-player-label');
+        const currentPlayerName = document.getElementById('current-player-name');
+        const guessInput = document.getElementById('guess-input');
+        const guessBtn = document.getElementById('guess-btn');
+        const errorMessage = document.getElementById('error-message');
+        const guessHistory = document.getElementById('guess-history');
+        const gameResult = document.getElementById('game-result');
+        const loseMessage = document.getElementById('lose-message');
+        const loserName = document.getElementById('loser-name');
+        const bombNumber = document.getElementById('bomb-number').querySelector('span');
+        const restartBtnContainer = document.getElementById('restart-btn-container');
+        const restartBtn = document.getElementById('restart-btn');
+        const gameTime = document.getElementById('game-time');
+
+        // 初始化玩家数量变化监听
+        playerCountRadios.forEach(radio => {
+            radio.addEventListener('change', updatePlayerInputs);
+        });
+
+        // 开始游戏按钮事件监听
+        startGameBtn.addEventListener('click', startGame);
+
+        // 猜测按钮事件监听
+        guessBtn.addEventListener('click', handleGuess);
+        guessInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                handleGuess();
+            }
+        });
+
+        // 重新开始按钮事件监听
+        restartBtn.addEventListener('click', resetGame);
+
+        // 更新玩家输入框
+        function updatePlayerInputs() {
+            const count = parseInt(document.querySelector('input[name="player-count"]:checked').value);
+            playerNameInputs.innerHTML = '';
+            
+            const playerColors = [
+                'player1', 'player2', 'player3', 'player4', 
+                'player5', 'player6', 'player7', 'player8',
+                'player9', 'player10'
+            ];
+            
+            for (let i = 0; i < count; i++) {
+                const playerDiv = document.createElement('div');
+                playerDiv.className = 'flex items-center';
+                
+                const colorClass = playerColors[i % playerColors.length];
+                
+                playerDiv.innerHTML = `
+                    <div class="w-10 h-10 rounded-full bg-${colorClass} flex items-center justify-center text-white mr-3 shadow-lg flex-shrink-0">
+                        <span class="font-bold">${i + 1}</span>
+                    </div>
+                    <input type="text" placeholder="玩家${i + 1}" class="flex-1 px-4 py-2 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all" value="玩家${i + 1}">
+                `;
+                
+                playerNameInputs.appendChild(playerDiv);
+            }
+        }
+
+        // 开始游戏
+        function startGame() {
+            // 获取玩家信息
+            const playerInputs = playerNameInputs.querySelectorAll('input');
+            const players = Array.from(playerInputs).map((input, index) => {
+                const playerColors = [
+                    'player1', 'player2', 'player3', 'player4', 
+                    'player5', 'player6', 'player7', 'player8',
+                    'player9', 'player10'
+                ];
+                const colorClass = playerColors[index % playerColors.length];
+                
+                return {
+                    id: index,
+                    name: input.value.trim() || `玩家${index + 1}`,
+                    color: colorClass,
+                    isActive: index === 0
+                };
+            });
+            
+            // 设置游戏状态
+            gameState.players = players;
+            gameState.currentPlayerIndex = 0;
+            gameState.min = 1;
+            gameState.max = 100;
+            gameState.bomb = Math.floor(Math.random() * 100) + 1;
+            gameState.history = [];
+            gameState.gameOver = false;
+            gameState.startTime = new Date();
+            
+            // 启动计时器
+            if (gameState.timer) clearInterval(gameState.timer);
+            gameState.timer = setInterval(updateGameTime, 1000);
+            
+            // 更新UI
+            updateRangeDisplay();
+            renderPlayerStatus();
+            updateCurrentPlayer();
+            clearGuessHistory();
+            
+            // 切换显示区域
+            gameSetup.classList.add('hidden');
+            gameArea.classList.remove('hidden');
+            
+            // 聚焦输入框
+            guessInput.focus();
+        }
+
+        // 渲染玩家状态
+        function renderPlayerStatus() {
+            playerStatus.innerHTML = '';
+            
+            gameState.players.forEach(player => {
+                const playerCard = document.createElement('div');
+                playerCard.id = `player-${player.id}`;
+                playerCard.className = `border-2 border-gray-100 rounded-xl p-3 transition-all duration-300 ${player.isActive ? 'player-active' : ''}`;
+                
+                playerCard.innerHTML = `
+                    <div class="flex flex-col items-center">
+                        <div class="w-8 h-8 rounded-full bg-${player.color} flex items-center justify-center text-white mb-2 shadow-lg text-xs">
+                            <span class="font-bold">${player.id + 1}</span>
+                        </div>
+                        <span class="font-bold text-sm text-${player.color} truncate max-w-full">${player.name}</span>
+                        ${player.isActive ? '<span class="mt-1 bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full">当前</span>' : ''}
+                    </div>
+                `;
+                
+                playerStatus.appendChild(playerCard);
+            });
+        }
+
+        // 更新当前玩家
+        function updateCurrentPlayer() {
+            const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+            
+            // 更新玩家卡片样式
+            gameState.players.forEach(player => {
+                player.isActive = player.id === gameState.currentPlayerIndex;
+                const playerCard = document.getElementById(`player-${player.id}`);
+                if (playerCard) {
+                    if (player.isActive) {
+                        playerCard.classList.add('player-active');
+                    } else {
+                        playerCard.classList.remove('player-active');
+                    }
+                }
+            });
+            
+            // 更新输入框标签
+            currentPlayerName.textContent = currentPlayer.name;
+            currentPlayerName.className = `font-bold text-${currentPlayer.color}`;
+            
+            // 添加动画效果
+            currentPlayerLabel.classList.add('animate-pulse-slow');
+            setTimeout(() => {
+                currentPlayerLabel.classList.remove('animate-pulse-slow');
+            }, 1000);
+        }
+
+        // 更新游戏时间
+        function updateGameTime() {
+            if (!gameState.startTime || gameState.gameOver) return;
+            
+            const now = new Date();
+            const diff = Math.floor((now - gameState.startTime) / 1000);
+            const minutes = Math.floor(diff / 60).toString().padStart(2, '0');
+            const seconds = (diff % 60).toString().padStart(2, '0');
+            
+            gameTime.textContent = `${minutes}:${seconds}`;
+        }
+
+        // 处理猜测
+        function handleGuess() {
+            if (gameState.gameOver) return;
+            
+            const guess = parseInt(guessInput.value);
+            const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+            
+            // 验证输入
+            if (isNaN(guess) || guess < gameState.min || guess > gameState.max) {
+                showError(`请输入${gameState.min}-${gameState.max}之间的数字`);
+                return;
+            }
+            
+            // 清除错误信息
+            hideError();
+            
+            // 添加到历史记录
+            gameState.history.push({
+                player: currentPlayer,
+                guess: guess
+            });
+            
+            // 更新UI
+            addToGuessHistory(currentPlayer, guess);
+            
+            // 检查游戏状态
+            if (guess === gameState.bomb) {
+                endGame(currentPlayer);
+            } else {
+                // 更新范围
+                if (guess < gameState.bomb) {
+                    gameState.min = guess + 1;
+                } else {
+                    gameState.max = guess - 1;
+                }
+                updateRangeDisplay();
+                
+                // 切换到下一个玩家
+                gameState.currentPlayerIndex = (gameState.currentPlayerIndex + 1) % gameState.players.length;
+                updateCurrentPlayer();
+            }
+            
+            // 清空输入框并聚焦
+            guessInput.value = '';
+            guessInput.focus();
+        }
+
+        // 结束游戏
+        function endGame(loser) {
+            gameState.gameOver = true;
+            
+            // 停止计时器
+            if (gameState.timer) {
+                clearInterval(gameState.timer);
+                gameState.timer = null;
+            }
+            
+            // 显示结果
+            gameResult.classList.remove('hidden');
+            loserName.textContent = loser.name;
+            loserName.className = `font-bold text-${loser.color}`;
+            bombNumber.textContent = gameState.bomb;
+            
+            // 添加爆炸动画
+            setTimeout(() => {
+                document.querySelector('.fa-bomb').classList.add('animate-shake');
+            }, 500);
+            
+            // 显示重新开始按钮
+            restartBtnContainer.classList.remove('hidden');
+        }
+
+        // 重置游戏
+        function resetGame() {
+            // 重置游戏状态
+            gameState.min = 1;
+            gameState.max = 100;
+            gameState.bomb = null;
+            gameState.currentPlayerIndex = 0;
+            gameState.history = [];
+            gameState.gameOver = false;
+            gameState.startTime = null;
+            
+            // 停止计时器
+            if (gameState.timer) {
+                clearInterval(gameState.timer);
+                gameState.timer = null;
+            }
+            
+            // 隐藏结果和重新开始按钮
+            gameResult.classList.add('hidden');
+            restartBtnContainer.classList.add('hidden');
+            
+            // 移除爆炸动画
+            document.querySelector('.fa-bomb').classList.remove('animate-shake');
+            
+            // 切换到游戏设置
+            gameArea.classList.add('hidden');
+            gameSetup.classList.remove('hidden');
+            
+            // 重置游戏时间显示
+            gameTime.textContent = '00:00';
+        }
+
+        // 更新范围显示
+        function updateRangeDisplay() {
+            rangeDisplay.textContent = `${gameState.min} - ${gameState.max}`;
+            
+            // 添加动画效果
+            rangeDisplay.classList.add('scale-105');
+            setTimeout(() => {
+                rangeDisplay.classList.remove('scale-105');
+            }, 300);
+        }
+
+        // 添加到猜测历史
+        function addToGuessHistory(player, guess) {
+            // 清空初始提示
+            if (guessHistory.querySelector('p.italic')) {
+                guessHistory.innerHTML = '';
+            }
+            
+            const isCorrect = guess === gameState.bomb;
+            const isHigher = guess > gameState.bomb;
+            const isLower = guess < gameState.bomb;
+            
+            const historyItem = document.createElement('div');
+            historyItem.className = 'flex justify-between items-center py-3 border-b border-gray-100 last:border-0 transition-all duration-300 hover:bg-gray-50 rounded-lg p-2';
+            
+            const playerInfo = document.createElement('div');
+            playerInfo.className = 'flex items-center';
+            
+            const playerColor = document.createElement('div');
+            playerColor.className = `w-7 h-7 rounded-full bg-${player.color} flex items-center justify-center text-white mr-2 shadow-md text-xs`;
+            playerColor.textContent = player.id + 1;
+            
+            const playerNameSpan = document.createElement('span');
+            playerNameSpan.className = `font-medium text-${player.color} text-sm`;
+            playerNameSpan.textContent = player.name;
+            
+            const guessNumber = document.createElement('span');
+            guessNumber.className = `font-bold ml-2 ${isCorrect ? 'text-secondary' : 'text-dark'} text-sm`;
+            guessNumber.textContent = guess;
+            
+            const result = document.createElement('span');
+            result.className = 'text-xs font-medium';
+            
+            if (isCorrect) {
+                result.className = 'text-xs font-bold text-secondary';
+                result.innerHTML = '<i class="fa fa-exclamation-circle mr-1"></i> 猜中了炸弹！';
+            } else {
+                result.innerHTML = isHigher 
+                    ? '<i class="fa fa-arrow-down mr-1 text-red-400"></i> 猜的数字太大了' 
+                    : '<i class="fa fa-arrow-up mr-1 text-green-400"></i> 猜的数字太小了';
+            }
+            
+            playerInfo.appendChild(playerColor);
+            playerInfo.appendChild(playerNameSpan);
+            playerInfo.appendChild(guessNumber);
+            
+            historyItem.appendChild(playerInfo);
+            historyItem.appendChild(result);
+            guessHistory.appendChild(historyItem);
+            
+            // 滚动到底部
+            guessHistory.scrollTop = guessHistory.scrollHeight;
+        }
+
+        // 清除猜测历史
+        function clearGuessHistory() {
+            guessHistory.innerHTML = '<p class="text-center text-neutral italic">游戏开始后，猜测记录将显示在这里</p>';
+        }
+
+        // 显示错误信息
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.classList.remove('hidden');
+            guessInput.classList.add('border-red-400');
+            guessInput.classList.remove('focus:border-primary');
+            guessInput.classList.add('focus:border-red-400');
+            
+            // 添加抖动动画
+            guessInput.classList.add('animate-shake');
+            setTimeout(() => {
+                guessInput.classList.remove('animate-shake');
+            }, 500);
+        }
+
+        // 隐藏错误信息
+        function hideError() {
+            errorMessage.classList.add('hidden');
+            guessInput.classList.remove('border-red-400');
+            guessInput.classList.add('focus:border-primary');
+            guessInput.classList.remove('focus:border-red-400');
+        }
+
+        // 初始化玩家输入框
+        updatePlayerInputs();
+    </script>
+</body>
+</html>
+    
