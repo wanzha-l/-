@@ -30,6 +30,38 @@
                     fontFamily: {
                         inter: ['Inter', 'system-ui', 'sans-serif'],
                     },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'bounce-slow': 'bounce 2s infinite',
+                        'float': 'float 3s ease-in-out infinite',
+                        'scale-in': 'scaleIn 0.5s ease-out forwards',
+                        'slide-up': 'slideUp 0.5s ease-out forwards',
+                        'explode': 'explode 0.5s ease-out forwards',
+                        'shimmer': 'shimmer 1.5s infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        },
+                        scaleIn: {
+                            '0%': { transform: 'scale(0.8)', opacity: '0' },
+                            '100%': { transform: 'scale(1)', opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                        explode: {
+                            '0%': { transform: 'scale(1)', opacity: '1' },
+                            '50%': { transform: 'scale(1.5)', opacity: '0.5' },
+                            '100%': { transform: 'scale(1)', opacity: '1' },
+                        },
+                        shimmer: {
+                            '0%': { backgroundPosition: '-468px 0' },
+                            '100%': { backgroundPosition: '468px 0' },
+                        }
+                    }
                 }
             }
         }
@@ -64,10 +96,63 @@
                 transform: translateY(-5px);
                 box-shadow: 0 10px 25px -5px rgba(22, 93, 255, 0.4);
                 border-color: #165DFF !important;
+                animation: playerActive 1.5s ease-in-out infinite;
+            }
+            @keyframes playerActive {
+                0%, 100% { transform: translateY(-5px); box-shadow: 0 10px 25px -5px rgba(22, 93, 255, 0.4); }
+                50% { transform: translateY(-8px); box-shadow: 0 15px 30px -5px rgba(22, 93, 255, 0.6); }
             }
             .glass-effect {
                 backdrop-filter: blur(10px);
                 background-color: rgba(255, 255, 255, 0.7);
+            }
+            .range-slider {
+                height: 8px;
+                border-radius: 4px;
+                background: #e0e7ff;
+                position: relative;
+            }
+            .range-slider::before {
+                content: '';
+                position: absolute;
+                height: 100%;
+                border-radius: 4px;
+                background: linear-gradient(90deg, #165DFF 0%, #818CF8 100%);
+                left: 0;
+                width: calc(((var(--max) - var(--min)) / 99) * 100%);
+            }
+            .number-badge {
+                transition: all 0.3s ease;
+            }
+            .number-badge:hover {
+                transform: scale(1.1);
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            }
+            .btn-gradient {
+                background-size: 200% auto;
+                transition: all 0.3s ease;
+            }
+            .btn-gradient:hover {
+                background-position: right center;
+            }
+            .input-focus {
+                transition: all 0.3s ease;
+            }
+            .input-focus:focus {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 20px -5px rgba(22, 93, 255, 0.2);
+            }
+            .history-item {
+                transition: all 0.3s ease;
+            }
+            .history-item:hover {
+                transform: translateX(5px);
+                background-color: rgba(22, 93, 255, 0.05);
+            }
+            .shimmer-effect {
+                background: linear-gradient(to right, #f6f7f8 8%, #edeef1 18%, #f6f7f8 33%);
+                background-size: 800px 104px;
+                animation: shimmer 1.5s infinite linear;
             }
         }
     </style>
@@ -75,7 +160,7 @@
 <body class="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen font-inter text-dark">
     <div class="container mx-auto px-4 py-8 max-w-5xl">
         <!-- 游戏标题 -->
-        <header class="text-center mb-8 transform transition-all duration-500 hover:scale-105">
+        <header class="text-center mb-8 animate-float">
             <h1 class="text-[clamp(2.2rem,5vw,3.8rem)] font-bold text-primary mb-2 text-shadow">
                 <i class="fa fa-bomb text-secondary animate-pulse-slow"></i> 数字炸弹
             </h1>
@@ -83,11 +168,11 @@
         </header>
 
         <!-- 游戏卡片 -->
-        <div class="bg-white rounded-3xl shadow-2xl overflow-hidden transition-all duration-500 hover:shadow-3xl">
+        <div class="bg-white rounded-3xl shadow-2xl overflow-hidden transition-all duration-500 hover:shadow-3xl transform hover:-translate-y-1">
             <!-- 游戏说明 -->
             <div class="bg-gradient-primary text-white p-8 relative overflow-hidden">
-                <div class="absolute -right-10 -top-10 w-40 h-40 bg-white/10 rounded-full"></div>
-                <div class="absolute -left-20 -bottom-10 w-60 h-60 bg-white/5 rounded-full"></div>
+                <div class="absolute -right-10 -top-10 w-40 h-40 bg-white/10 rounded-full animate-pulse-slow"></div>
+                <div class="absolute -left-20 -bottom-10 w-60 h-60 bg-white/5 rounded-full animate-pulse-slow" style="animation-delay: 1s;"></div>
                 
                 <h2 class="text-2xl font-bold mb-4 flex items-center">
                     <i class="fa fa-info-circle mr-2"></i> 多人游戏规则
@@ -121,37 +206,17 @@
                 <!-- 玩家数量选择 -->
                 <div class="mb-8">
                     <label class="block text-sm font-medium text-neutral mb-3">玩家数量</label>
-                    <div class="grid grid-cols-5 gap-3">
-                        <label class="relative cursor-pointer">
-                            <input type="radio" name="player-count" value="2" class="sr-only peer" checked>
-                            <div class="w-full h-16 rounded-xl border-2 border-gray-200 peer-checked:border-primary peer-checked:bg-primary/5 flex items-center justify-center transition-all duration-300 hover:bg-gray-50">
-                                <span class="font-medium">2 人</span>
-                            </div>
-                        </label>
-                        <label class="relative cursor-pointer">
-                            <input type="radio" name="player-count" value="3" class="sr-only peer">
-                            <div class="w-full h-16 rounded-xl border-2 border-gray-200 peer-checked:border-primary peer-checked:bg-primary/5 flex items-center justify-center transition-all duration-300 hover:bg-gray-50">
-                                <span class="font-medium">3 人</span>
-                            </div>
-                        </label>
-                        <label class="relative cursor-pointer">
-                            <input type="radio" name="player-count" value="4" class="sr-only peer">
-                            <div class="w-full h-16 rounded-xl border-2 border-gray-200 peer-checked:border-primary peer-checked:bg-primary/5 flex items-center justify-center transition-all duration-300 hover:bg-gray-50">
-                                <span class="font-medium">4 人</span>
-                            </div>
-                        </label>
-                        <label class="relative cursor-pointer">
-                            <input type="radio" name="player-count" value="8" class="sr-only peer">
-                            <div class="w-full h-16 rounded-xl border-2 border-gray-200 peer-checked:border-primary peer-checked:bg-primary/5 flex items-center justify-center transition-all duration-300 hover:bg-gray-50">
-                                <span class="font-medium">8 人</span>
-                            </div>
-                        </label>
-                        <label class="relative cursor-pointer">
-                            <input type="radio" name="player-count" value="10" class="sr-only peer">
-                            <div class="w-full h-16 rounded-xl border-2 border-gray-200 peer-checked:border-primary peer-checked:bg-primary/5 flex items-center justify-center transition-all duration-300 hover:bg-gray-50">
-                                <span class="font-medium">10 人</span>
-                            </div>
-                        </label>
+                    <div class="flex items-center">
+                        <button id="decrease-player" class="w-12 h-12 rounded-l-xl border-2 border-gray-200 bg-gray-50 flex items-center justify-center text-neutral hover:bg-gray-100 transition-all duration-300 hover:scale-105">
+                            <i class="fa fa-minus"></i>
+                        </button>
+                        <div class="w-24 h-12 border-t-2 border-b-2 border-gray-200 flex items-center justify-center font-bold text-xl" id="player-count-display">2</div>
+                        <button id="increase-player" class="w-12 h-12 rounded-r-xl border-2 border-gray-200 bg-gray-50 flex items-center justify-center text-neutral hover:bg-gray-100 transition-all duration-300 hover:scale-105">
+                            <i class="fa fa-plus"></i>
+                        </button>
+                        <div class="ml-4 text-sm text-neutral">
+                            <span id="player-count-text">最少2人，最多10人</span>
+                        </div>
                     </div>
                 </div>
                 
@@ -167,7 +232,7 @@
                 
                 <!-- 开始游戏按钮 -->
                 <div class="text-center">
-                    <button id="start-game-btn" class="bg-gradient-primary text-white px-10 py-4 rounded-2xl transition-all duration-300 hover:shadow-lg hover:shadow-primary/30 flex items-center mx-auto justify-center text-lg font-medium transform hover:-translate-y-1">
+                    <button id="start-game-btn" class="bg-gradient-primary text-white px-10 py-4 rounded-2xl transition-all duration-300 hover:shadow-lg hover:shadow-primary/30 flex items-center mx-auto justify-center text-lg font-medium transform hover:-translate-y-1 btn-gradient">
                         <i class="fa fa-play mr-3"></i> 开始游戏
                     </button>
                 </div>
@@ -181,11 +246,15 @@
                 </div>
 
                 <!-- 游戏状态 -->
-                <div class="mb-8 bg-gray-50 rounded-2xl p-6">
+                <div class="mb-8 bg-gray-50 rounded-2xl p-6 relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-secondary"></div>
                     <div class="flex justify-between items-center">
                         <div>
                             <p class="text-sm text-neutral mb-1">当前范围</p>
-                            <p id="range-display" class="text-3xl font-bold text-primary">1 - 100</p>
+                            <div class="flex items-center">
+                                <span id="range-display" class="text-3xl font-bold text-primary mr-3">1 - 100</span>
+                                <div class="range-slider w-32" style="--min: 1; --max: 100;"></div>
+                            </div>
                         </div>
                         <div class="flex items-center">
                             <i class="fa fa-clock-o text-neutral mr-2"></i>
@@ -200,8 +269,8 @@
                         <span id="current-player-name">玩家1</span>，请输入你的猜测 (1-100)
                     </label>
                     <div class="flex">
-                        <input type="number" id="guess-input" min="1" max="100" class="flex-1 px-5 py-4 border-2 border-gray-200 rounded-l-2xl focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all text-lg" placeholder="输入数字...">
-                        <button id="guess-btn" class="bg-gradient-primary hover:bg-gradient-to-r hover:from-primary hover:to-primary/80 text-white px-8 py-4 rounded-r-2xl transition-all duration-300 flex items-center justify-center text-lg font-medium">
+                        <input type="number" id="guess-input" min="1" max="100" class="flex-1 px-5 py-4 border-2 border-gray-200 rounded-l-2xl focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all text-lg input-focus" placeholder="输入数字...">
+                        <button id="guess-btn" class="bg-gradient-primary hover:bg-gradient-to-r hover:from-primary hover:to-primary/80 text-white px-8 py-4 rounded-r-2xl transition-all duration-300 flex items-center justify-center text-lg font-medium btn-gradient">
                             <i class="fa fa-paper-plane mr-2"></i> 猜测
                         </button>
                     </div>
@@ -219,9 +288,12 @@
                 </div>
 
                 <!-- 游戏结果 -->
-                <div id="game-result" class="hidden mb-8 p-8 rounded-2xl text-center bg-gradient-secondary/10 border border-secondary/20">
-                    <div id="lose-message">
-                        <div class="inline-flex items-center justify-center w-20 h-20 bg-secondary/20 rounded-full mb-4">
+                <div id="game-result" class="hidden mb-8 p-8 rounded-2xl text-center bg-gradient-secondary/10 border border-secondary/20 relative overflow-hidden">
+                    <div class="absolute -right-16 -top-16 w-40 h-40 bg-secondary/10 rounded-full animate-pulse-slow"></div>
+                    <div class="absolute -left-20 -bottom-20 w-60 h-60 bg-secondary/5 rounded-full animate-pulse-slow" style="animation-delay: 1s;"></div>
+                    
+                    <div id="lose-message" class="relative z-10">
+                        <div class="inline-flex items-center justify-center w-20 h-20 bg-secondary/20 rounded-full mb-4 animate-explode">
                             <i class="fa fa-bomb text-4xl text-secondary animate-pulse"></i>
                         </div>
                         <h3 class="text-2xl font-bold mb-3 text-dark">游戏结束！</h3>
@@ -234,7 +306,7 @@
 
                 <!-- 重新开始按钮 -->
                 <div id="restart-btn-container" class="hidden text-center">
-                    <button id="restart-btn" class="bg-gradient-secondary text-white px-10 py-4 rounded-2xl transition-all duration-300 hover:shadow-lg hover:shadow-secondary/30 flex items-center mx-auto justify-center text-lg font-medium transform hover:-translate-y-1">
+                    <button id="restart-btn" class="bg-gradient-secondary text-white px-10 py-4 rounded-2xl transition-all duration-300 hover:shadow-lg hover:shadow-secondary/30 flex items-center mx-auto justify-center text-lg font-medium transform hover:-translate-y-1 btn-gradient">
                         <i class="fa fa-refresh mr-3"></i> 重新开始
                     </button>
                 </div>
@@ -258,14 +330,17 @@
             history: [],
             gameOver: false,
             startTime: null,
-            timer: null
+            timer: null,
+            playerCount: 2 // 新增玩家数量状态
         };
 
         // DOM元素
         const gameSetup = document.getElementById('game-setup');
         const gameArea = document.getElementById('game-area');
         const startGameBtn = document.getElementById('start-game-btn');
-        const playerCountRadios = document.querySelectorAll('input[name="player-count"]');
+        const playerCountDisplay = document.getElementById('player-count-display');
+        const decreasePlayerBtn = document.getElementById('decrease-player');
+        const increasePlayerBtn = document.getElementById('increase-player');
         const playerNameInputs = document.getElementById('player-name-inputs');
         const playerStatus = document.getElementById('player-status');
         const rangeDisplay = document.getElementById('range-display');
@@ -282,11 +357,52 @@
         const restartBtnContainer = document.getElementById('restart-btn-container');
         const restartBtn = document.getElementById('restart-btn');
         const gameTime = document.getElementById('game-time');
+        const rangeSlider = document.querySelector('.range-slider');
 
         // 初始化玩家数量变化监听
-        playerCountRadios.forEach(radio => {
-            radio.addEventListener('change', updatePlayerInputs);
+        decreasePlayerBtn.addEventListener('click', () => {
+            if (gameState.playerCount > 2) {
+                gameState.playerCount--;
+                updatePlayerCount();
+                updatePlayerInputs();
+                // 添加动画效果
+                playerCountDisplay.classList.add('scale-110', 'text-primary');
+                setTimeout(() => {
+                    playerCountDisplay.classList.remove('scale-110', 'text-primary');
+                }, 300);
+            }
         });
+
+        increasePlayerBtn.addEventListener('click', () => {
+            if (gameState.playerCount < 10) {
+                gameState.playerCount++;
+                updatePlayerCount();
+                updatePlayerInputs();
+                // 添加动画效果
+                playerCountDisplay.classList.add('scale-110', 'text-primary');
+                setTimeout(() => {
+                    playerCountDisplay.classList.remove('scale-110', 'text-primary');
+                }, 300);
+            }
+        });
+
+        // 更新玩家数量显示
+        function updatePlayerCount() {
+            playerCountDisplay.textContent = gameState.playerCount;
+            
+            // 更新按钮状态
+            decreasePlayerBtn.disabled = gameState.playerCount <= 2;
+            decreasePlayerBtn.classList.toggle('opacity-50', gameState.playerCount <= 2);
+            
+            increasePlayerBtn.disabled = gameState.playerCount >= 10;
+            increasePlayerBtn.classList.toggle('opacity-50', gameState.playerCount >= 10);
+            
+            // 更新滑块
+            if (rangeSlider) {
+                rangeSlider.style.setProperty('--min', gameState.min);
+                rangeSlider.style.setProperty('--max', gameState.max);
+            }
+        }
 
         // 开始游戏按钮事件监听
         startGameBtn.addEventListener('click', startGame);
@@ -304,7 +420,6 @@
 
         // 更新玩家输入框
         function updatePlayerInputs() {
-            const count = parseInt(document.querySelector('input[name="player-count"]:checked').value);
             playerNameInputs.innerHTML = '';
             
             const playerColors = [
@@ -313,14 +428,15 @@
                 'player9', 'player10'
             ];
             
-            for (let i = 0; i < count; i++) {
+            for (let i = 0; i < gameState.playerCount; i++) {
                 const playerDiv = document.createElement('div');
-                playerDiv.className = 'flex items-center';
+                playerDiv.className = 'flex items-center opacity-0 animate-scale-in';
+                playerDiv.style.animationDelay = `${i * 0.1}s`;
                 
                 const colorClass = playerColors[i % playerColors.length];
                 
                 playerDiv.innerHTML = `
-                    <div class="w-10 h-10 rounded-full bg-${colorClass} flex items-center justify-center text-white mr-3 shadow-lg flex-shrink-0">
+                    <div class="w-10 h-10 rounded-full bg-${colorClass} flex items-center justify-center text-white mr-3 shadow-lg flex-shrink-0 number-badge">
                         <span class="font-bold">${i + 1}</span>
                     </div>
                     <input type="text" placeholder="玩家${i + 1}" class="flex-1 px-4 py-2 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all" value="玩家${i + 1}">
@@ -373,23 +489,31 @@
             // 切换显示区域
             gameSetup.classList.add('hidden');
             gameArea.classList.remove('hidden');
+            gameArea.classList.add('animate-scale-in');
             
             // 聚焦输入框
             guessInput.focus();
+            
+            // 更新滑块
+            if (rangeSlider) {
+                rangeSlider.style.setProperty('--min', gameState.min);
+                rangeSlider.style.setProperty('--max', gameState.max);
+            }
         }
 
         // 渲染玩家状态
         function renderPlayerStatus() {
             playerStatus.innerHTML = '';
             
-            gameState.players.forEach(player => {
+            gameState.players.forEach((player, index) => {
                 const playerCard = document.createElement('div');
                 playerCard.id = `player-${player.id}`;
-                playerCard.className = `border-2 border-gray-100 rounded-xl p-3 transition-all duration-300 ${player.isActive ? 'player-active' : ''}`;
+                playerCard.className = `border-2 border-gray-100 rounded-xl p-3 transition-all duration-300 opacity-0 animate-slide-up`;
+                playerCard.style.animationDelay = `${index * 0.1}s`;
                 
                 playerCard.innerHTML = `
                     <div class="flex flex-col items-center">
-                        <div class="w-8 h-8 rounded-full bg-${player.color} flex items-center justify-center text-white mb-2 shadow-lg text-xs">
+                        <div class="w-8 h-8 rounded-full bg-${player.color} flex items-center justify-center text-white mb-2 shadow-lg text-xs number-badge">
                             <span class="font-bold">${player.id + 1}</span>
                         </div>
                         <span class="font-bold text-sm text-${player.color} truncate max-w-full">${player.name}</span>
@@ -500,6 +624,7 @@
             
             // 显示结果
             gameResult.classList.remove('hidden');
+            gameResult.classList.add('animate-scale-in');
             loserName.textContent = loser.name;
             loserName.className = `font-bold text-${loser.color}`;
             bombNumber.textContent = gameState.bomb;
@@ -511,6 +636,7 @@
             
             // 显示重新开始按钮
             restartBtnContainer.classList.remove('hidden');
+            restartBtnContainer.classList.add('animate-slide-up');
         }
 
         // 重置游戏
@@ -543,6 +669,12 @@
             
             // 重置游戏时间显示
             gameTime.textContent = '00:00';
+            
+            // 更新滑块
+            if (rangeSlider) {
+                rangeSlider.style.setProperty('--min', gameState.min);
+                rangeSlider.style.setProperty('--max', gameState.max);
+            }
         }
 
         // 更新范围显示
@@ -554,6 +686,18 @@
             setTimeout(() => {
                 rangeDisplay.classList.remove('scale-105');
             }, 300);
+            
+            // 更新滑块
+            if (rangeSlider) {
+                rangeSlider.style.setProperty('--min', gameState.min);
+                rangeSlider.style.setProperty('--max', gameState.max);
+                
+                // 添加动画效果
+                rangeSlider.classList.add('scale-105');
+                setTimeout(() => {
+                    rangeSlider.classList.remove('scale-105');
+                }, 300);
+            }
         }
 
         // 添加到猜测历史
@@ -568,13 +712,14 @@
             const isLower = guess < gameState.bomb;
             
             const historyItem = document.createElement('div');
-            historyItem.className = 'flex justify-between items-center py-3 border-b border-gray-100 last:border-0 transition-all duration-300 hover:bg-gray-50 rounded-lg p-2';
+            historyItem.className = 'flex justify-between items-center py-3 border-b border-gray-100 last:border-0 transition-all duration-300 hover:bg-gray-50 rounded-lg p-2 history-item opacity-0 animate-slide-up';
+            historyItem.style.animationDelay = '0.1s';
             
             const playerInfo = document.createElement('div');
             playerInfo.className = 'flex items-center';
             
             const playerColor = document.createElement('div');
-            playerColor.className = `w-7 h-7 rounded-full bg-${player.color} flex items-center justify-center text-white mr-2 shadow-md text-xs`;
+            playerColor.className = `w-7 h-7 rounded-full bg-${player.color} flex items-center justify-center text-white mr-2 shadow-md text-xs number-badge`;
             playerColor.textContent = player.id + 1;
             
             const playerNameSpan = document.createElement('span');
@@ -618,6 +763,7 @@
         function showError(message) {
             errorMessage.textContent = message;
             errorMessage.classList.remove('hidden');
+            errorMessage.classList.add('animate-shake');
             guessInput.classList.add('border-red-400');
             guessInput.classList.remove('focus:border-primary');
             guessInput.classList.add('focus:border-red-400');
@@ -626,6 +772,7 @@
             guessInput.classList.add('animate-shake');
             setTimeout(() => {
                 guessInput.classList.remove('animate-shake');
+                errorMessage.classList.remove('animate-shake');
             }, 500);
         }
 
@@ -637,9 +784,9 @@
             guessInput.classList.remove('focus:border-red-400');
         }
 
-        // 初始化玩家输入框
+        // 初始化
+        updatePlayerCount();
         updatePlayerInputs();
     </script>
 </body>
-</html>
-    
+</html>    
