@@ -11,21 +11,21 @@
             theme: {
                 extend: {
                     colors: {
-                        primary: '#FF5252',
-                        secondary: '#FBBF24',
+                        primary: '#165DFF',
+                        secondary: '#FF5252',
                         neutral: '#6B7280',
                         dark: '#1F2937',
                         light: '#F9FAFB',
-                        player1: '#FF5252', // 粉色
-                        player2: '#EC4899', // 紫红色
-                        player3: '#F472B6', // 浅粉色
-                        player4: '#FB923C', // 橙色
-                        player5: '#FBBF24', // 黄色
-                        player6: '#EAB308', // 金黄色
-                        player7: '#D97706', // 深橙色
-                        player8: '#F97316', // 橙红色
-                        player9: '#F59E0B', // 琥珀色
-                        player10: '#FBBF24', // 亮黄色
+                        player1: '#165DFF', // 蓝色
+                        player2: '#36D399', // 绿色
+                        player3: '#A855F7', // 紫色
+                        player4: '#EC4899', // 粉色
+                        player5: '#F97316', // 橙色
+                        player6: '#FBBF24', // 黄色
+                        player7: '#06B6D4', // 青色
+                        player8: '#8B5CF6', // 靛蓝色
+                        player9: '#EC4899', // 紫红色
+                        player10: '#10B981', // 薄荷绿
                     },
                     fontFamily: {
                         inter: ['Inter', 'system-ui', 'sans-serif'],
@@ -75,10 +75,10 @@
                 text-shadow: 0 2px 4px rgba(0,0,0,0.1);
             }
             .bg-gradient-primary {
-                background: linear-gradient(135deg, #FF5252 0%, #FBBF24 100%);
+                background: linear-gradient(135deg, #165DFF 0%, #0040C1 100%);
             }
             .bg-gradient-secondary {
-                background: linear-gradient(135deg, #FBBF24 0%, #FF5252 100%);
+                background: linear-gradient(135deg, #FF5252 0%, #D32F2F 100%);
             }
             .animate-pulse-slow {
                 animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
@@ -94,13 +94,13 @@
             }
             .player-active {
                 transform: translateY(-5px);
-                box-shadow: 0 10px 25px -5px rgba(255, 82, 82, 0.4);
-                border-color: #FF5252 !important;
+                box-shadow: 0 10px 25px -5px rgba(22, 93, 255, 0.4);
+                border-color: #165DFF !important;
                 animation: playerActive 1.5s ease-in-out infinite;
             }
             @keyframes playerActive {
-                0%, 100% { transform: translateY(-5px); box-shadow: 0 10px 25px -5px rgba(255, 82, 82, 0.4); }
-                50% { transform: translateY(-8px); box-shadow: 0 15px 30px -5px rgba(255, 82, 82, 0.6); }
+                0%, 100% { transform: translateY(-5px); box-shadow: 0 10px 25px -5px rgba(22, 93, 255, 0.4); }
+                50% { transform: translateY(-8px); box-shadow: 0 15px 30px -5px rgba(22, 93, 255, 0.6); }
             }
             .glass-effect {
                 backdrop-filter: blur(10px);
@@ -109,7 +109,7 @@
             .range-slider {
                 height: 8px;
                 border-radius: 4px;
-                background: #ffe4e6;
+                background: #e0e7ff;
                 position: relative;
             }
             .range-slider::before {
@@ -117,7 +117,7 @@
                 position: absolute;
                 height: 100%;
                 border-radius: 4px;
-                background: linear-gradient(90deg, #FF5252 0%, #FBBF24 100%);
+                background: linear-gradient(90deg, #165DFF 0%, #818CF8 100%);
                 left: 0;
                 width: calc(((var(--max) - var(--min)) / 99) * 100%);
             }
@@ -140,27 +140,24 @@
             }
             .input-focus:focus {
                 transform: translateY(-2px);
-                box-shadow: 0 10px 20px -5px rgba(255, 82, 82, 0.2);
+                box-shadow: 0 10px 20px -5px rgba(22, 93, 255, 0.2);
             }
             .history-item {
                 transition: all 0.3s ease;
             }
             .history-item:hover {
                 transform: translateX(5px);
-                background-color: rgba(255, 82, 82, 0.05);
+                background-color: rgba(22, 93, 255, 0.05);
             }
             .shimmer-effect {
                 background: linear-gradient(to right, #f6f7f8 8%, #edeef1 18%, #f6f7f8 33%);
                 background-size: 800px 104px;
                 animation: shimmer 1.5s infinite linear;
             }
-            .color-transition {
-                transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease;
-            }
         }
     </style>
 </head>
-<body class="bg-gradient-to-br from-pink-50 to-yellow-50 min-h-screen font-inter text-dark color-transition">
+<body class="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen font-inter text-dark">
     <div class="container mx-auto px-4 py-8 max-w-5xl">
         <!-- 游戏标题 -->
         <header class="text-center mb-8 animate-float">
@@ -171,9 +168,9 @@
         </header>
 
         <!-- 游戏卡片 -->
-        <div id="game-card" class="bg-white rounded-3xl shadow-2xl overflow-hidden transition-all duration-500 hover:shadow-3xl transform hover:-translate-y-1 color-transition border-2 border-primary/20">
+        <div class="bg-white rounded-3xl shadow-2xl overflow-hidden transition-all duration-500 hover:shadow-3xl transform hover:-translate-y-1">
             <!-- 游戏说明 -->
-            <div id="game-rules" class="bg-gradient-primary text-white p-8 relative overflow-hidden color-transition">
+            <div class="bg-gradient-primary text-white p-8 relative overflow-hidden">
                 <div class="absolute -right-10 -top-10 w-40 h-40 bg-white/10 rounded-full animate-pulse-slow"></div>
                 <div class="absolute -left-20 -bottom-10 w-60 h-60 bg-white/5 rounded-full animate-pulse-slow" style="animation-delay: 1s;"></div>
                 
@@ -205,18 +202,6 @@
                 <h3 class="text-xl font-bold mb-6 flex items-center">
                     <i class="fa fa-cog mr-2 text-primary"></i> 游戏设置
                 </h3>
-                
-                <!-- 主题选择 -->
-                <div class="mb-8">
-                    <label class="block text-sm font-medium text-neutral mb-3">选择主题</label>
-                    <div class="flex flex-wrap gap-3">
-                        <button class="theme-btn w-10 h-10 rounded-full bg-pink-500 border-2 border-white shadow-md hover:scale-110 transition-all duration-300 ring-4 ring-offset-2 ring-pink-500" data-theme="pink-yellow" style="background: linear-gradient(135deg, #FF5252 0%, #FBBF24 100%);"></button>
-                        <button class="theme-btn w-10 h-10 rounded-full bg-blue-500 border-2 border-white shadow-md hover:scale-110 transition-all duration-300" data-theme="blue" style="background-color: #165DFF;"></button>
-                        <button class="theme-btn w-10 h-10 rounded-full bg-red-500 border-2 border-white shadow-md hover:scale-110 transition-all duration-300" data-theme="red" style="background-color: #FF5252;"></button>
-                        <button class="theme-btn w-10 h-10 rounded-full bg-green-500 border-2 border-white shadow-md hover:scale-110 transition-all duration-300" data-theme="green" style="background-color: #36D399;"></button>
-                        <button class="theme-btn w-10 h-10 rounded-full bg-purple-500 border-2 border-white shadow-md hover:scale-110 transition-all duration-300" data-theme="purple" style="background-color: #A855F7;"></button>
-                    </div>
-                </div>
                 
                 <!-- 玩家数量选择 -->
                 <div class="mb-8">
@@ -335,55 +320,6 @@
     </div>
 
     <script>
-        // 主题配置
-        const themes = {
-            'pink-yellow': {
-                primary: '#FF5252',
-                secondary: '#FBBF24',
-                gradientPrimary: 'linear-gradient(135deg, #FF5252 0%, #FBBF24 100%)',
-                gradientSecondary: 'linear-gradient(135deg, #FBBF24 0%, #FF5252 100%)',
-                bgGradient: 'from-pink-50 to-yellow-50'
-            },
-            blue: {
-                primary: '#165DFF',
-                secondary: '#FF5252',
-                gradientPrimary: 'linear-gradient(135deg, #165DFF 0%, #0040C1 100%)',
-                gradientSecondary: 'linear-gradient(135deg, #FF5252 0%, #D32F2F 100%)',
-                bgGradient: 'from-blue-50 to-indigo-50'
-            },
-            red: {
-                primary: '#FF5252',
-                secondary: '#165DFF',
-                gradientPrimary: 'linear-gradient(135deg, #FF5252 0%, #D32F2F 100%)',
-                gradientSecondary: 'linear-gradient(135deg, #165DFF 0%, #0040C1 100%)',
-                bgGradient: 'from-red-50 to-pink-50'
-            },
-            green: {
-                primary: '#36D399',
-                secondary: '#A855F7',
-                gradientPrimary: 'linear-gradient(135deg, #36D399 0%, #10B981 100%)',
-                gradientSecondary: 'linear-gradient(135deg, #A855F7 0%, #8B5CF6 100%)',
-                bgGradient: 'from-green-50 to-emerald-50'
-            },
-            purple: {
-                primary: '#A855F7',
-                secondary: '#36D399',
-                gradientPrimary: 'linear-gradient(135deg, #A855F7 0%, #8B5CF6 100%)',
-                gradientSecondary: 'linear-gradient(135deg, #36D399 0%, #10B981 100%)',
-                bgGradient: 'from-purple-50 to-indigo-50'
-            },
-            yellow: {
-                primary: '#FBBF24',
-                secondary: '#165DFF',
-                gradientPrimary: 'linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%)',
-                gradientSecondary: 'linear-gradient(135deg, #165DFF 0%, #0040C1 100%)',
-                bgGradient: 'from-yellow-50 to-orange-50'
-            }
-        };
-
-        // 当前主题
-        let currentTheme = 'pink-yellow';
-
         // 游戏状态
         let gameState = {
             min: 1,
@@ -422,57 +358,6 @@
         const restartBtn = document.getElementById('restart-btn');
         const gameTime = document.getElementById('game-time');
         const rangeSlider = document.querySelector('.range-slider');
-        const gameCard = document.getElementById('game-card');
-        const gameRules = document.getElementById('game-rules');
-        const body = document.body;
-        const themeBtns = document.querySelectorAll('.theme-btn');
-
-        // 初始化主题按钮事件监听
-        themeBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                const theme = btn.getAttribute('data-theme');
-                changeTheme(theme);
-                
-                // 添加选中效果
-                themeBtns.forEach(b => b.classList.remove('ring-4', 'ring-offset-2'));
-                btn.classList.add('ring-4', 'ring-offset-2', `ring-${theme === 'pink-yellow' ? 'pink' : theme}`);
-            });
-        });
-
-        // 改变主题
-        function changeTheme(theme) {
-            currentTheme = theme;
-            const colors = themes[theme];
-            
-            // 更新CSS变量
-            document.documentElement.style.setProperty('--primary-color', colors.primary);
-            document.documentElement.style.setProperty('--secondary-color', colors.secondary);
-            
-            // 更新背景渐变
-            body.className = `bg-gradient-to-br ${colors.bgGradient} min-h-screen font-inter text-dark color-transition`;
-            
-            // 更新游戏卡片和规则区域
-            gameCard.style.borderColor = colors.primary;
-            gameRules.style.background = colors.gradientPrimary;
-            
-            // 更新按钮和输入框
-            startGameBtn.style.background = colors.gradientPrimary;
-            guessBtn.style.background = colors.gradientPrimary;
-            restartBtn.style.background = colors.gradientSecondary;
-            
-            // 更新范围滑块
-            if (rangeSlider) {
-                rangeSlider.style.background = theme === 'pink-yellow' ? '#ffe4e6' : '#e0e7ff';
-                rangeSlider.querySelector('::before').style.background = `linear-gradient(90deg, ${colors.primary} 0%, ${theme === 'pink-yellow' ? '#FBBF24' : `${colors.primary}80`} 100%)`;
-            }
-            
-            // 更新游戏结果区域
-            gameResult.style.background = `${colors.secondary}/10`;
-            gameResult.style.borderColor = `${colors.secondary}/20`;
-            
-            // 更新当前玩家指示器
-            currentPlayerName.className = `font-bold text-${theme === 'blue' ? 'primary' : theme === 'pink-yellow' ? 'player1' : theme}`;
-        }
 
         // 初始化玩家数量变化监听
         decreasePlayerBtn.addEventListener('click', () => {
@@ -641,3 +526,267 @@
         }
 
         // 更新当前玩家
+        function updateCurrentPlayer() {
+            const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+            
+            // 更新玩家卡片样式
+            gameState.players.forEach(player => {
+                player.isActive = player.id === gameState.currentPlayerIndex;
+                const playerCard = document.getElementById(`player-${player.id}`);
+                if (playerCard) {
+                    if (player.isActive) {
+                        playerCard.classList.add('player-active');
+                    } else {
+                        playerCard.classList.remove('player-active');
+                    }
+                }
+            });
+            
+            // 更新输入框标签
+            currentPlayerName.textContent = currentPlayer.name;
+            currentPlayerName.className = `font-bold text-${currentPlayer.color}`;
+            
+            // 添加动画效果
+            currentPlayerLabel.classList.add('animate-pulse-slow');
+            setTimeout(() => {
+                currentPlayerLabel.classList.remove('animate-pulse-slow');
+            }, 1000);
+        }
+
+        // 更新游戏时间
+        function updateGameTime() {
+            if (!gameState.startTime || gameState.gameOver) return;
+            
+            const now = new Date();
+            const diff = Math.floor((now - gameState.startTime) / 1000);
+            const minutes = Math.floor(diff / 60).toString().padStart(2, '0');
+            const seconds = (diff % 60).toString().padStart(2, '0');
+            
+            gameTime.textContent = `${minutes}:${seconds}`;
+        }
+
+        // 处理猜测
+        function handleGuess() {
+            if (gameState.gameOver) return;
+            
+            const guess = parseInt(guessInput.value);
+            const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+            
+            // 验证输入
+            if (isNaN(guess) || guess < gameState.min || guess > gameState.max) {
+                showError(`请输入${gameState.min}-${gameState.max}之间的数字`);
+                return;
+            }
+            
+            // 清除错误信息
+            hideError();
+            
+            // 添加到历史记录
+            gameState.history.push({
+                player: currentPlayer,
+                guess: guess
+            });
+            
+            // 更新UI
+            addToGuessHistory(currentPlayer, guess);
+            
+            // 检查游戏状态
+            if (guess === gameState.bomb) {
+                endGame(currentPlayer);
+            } else {
+                // 更新范围
+                if (guess < gameState.bomb) {
+                    gameState.min = guess + 1;
+                } else {
+                    gameState.max = guess - 1;
+                }
+                updateRangeDisplay();
+                
+                // 切换到下一个玩家
+                gameState.currentPlayerIndex = (gameState.currentPlayerIndex + 1) % gameState.players.length;
+                updateCurrentPlayer();
+            }
+            
+            // 清空输入框并聚焦
+            guessInput.value = '';
+            guessInput.focus();
+        }
+
+        // 结束游戏
+        function endGame(loser) {
+            gameState.gameOver = true;
+            
+            // 停止计时器
+            if (gameState.timer) {
+                clearInterval(gameState.timer);
+                gameState.timer = null;
+            }
+            
+            // 显示结果
+            gameResult.classList.remove('hidden');
+            gameResult.classList.add('animate-scale-in');
+            loserName.textContent = loser.name;
+            loserName.className = `font-bold text-${loser.color}`;
+            bombNumber.textContent = gameState.bomb;
+            
+            // 添加爆炸动画
+            setTimeout(() => {
+                document.querySelector('.fa-bomb').classList.add('animate-shake');
+            }, 500);
+            
+            // 显示重新开始按钮
+            restartBtnContainer.classList.remove('hidden');
+            restartBtnContainer.classList.add('animate-slide-up');
+        }
+
+        // 重置游戏
+        function resetGame() {
+            // 重置游戏状态
+            gameState.min = 1;
+            gameState.max = 100;
+            gameState.bomb = null;
+            gameState.currentPlayerIndex = 0;
+            gameState.history = [];
+            gameState.gameOver = false;
+            gameState.startTime = null;
+            
+            // 停止计时器
+            if (gameState.timer) {
+                clearInterval(gameState.timer);
+                gameState.timer = null;
+            }
+            
+            // 隐藏结果和重新开始按钮
+            gameResult.classList.add('hidden');
+            restartBtnContainer.classList.add('hidden');
+            
+            // 移除爆炸动画
+            document.querySelector('.fa-bomb').classList.remove('animate-shake');
+            
+            // 切换到游戏设置
+            gameArea.classList.add('hidden');
+            gameSetup.classList.remove('hidden');
+            
+            // 重置游戏时间显示
+            gameTime.textContent = '00:00';
+            
+            // 更新滑块
+            if (rangeSlider) {
+                rangeSlider.style.setProperty('--min', gameState.min);
+                rangeSlider.style.setProperty('--max', gameState.max);
+            }
+        }
+
+        // 更新范围显示
+        function updateRangeDisplay() {
+            rangeDisplay.textContent = `${gameState.min} - ${gameState.max}`;
+            
+            // 添加动画效果
+            rangeDisplay.classList.add('scale-105');
+            setTimeout(() => {
+                rangeDisplay.classList.remove('scale-105');
+            }, 300);
+            
+            // 更新滑块
+            if (rangeSlider) {
+                rangeSlider.style.setProperty('--min', gameState.min);
+                rangeSlider.style.setProperty('--max', gameState.max);
+                
+                // 添加动画效果
+                rangeSlider.classList.add('scale-105');
+                setTimeout(() => {
+                    rangeSlider.classList.remove('scale-105');
+                }, 300);
+            }
+        }
+
+        // 添加到猜测历史
+        function addToGuessHistory(player, guess) {
+            // 清空初始提示
+            if (guessHistory.querySelector('p.italic')) {
+                guessHistory.innerHTML = '';
+            }
+            
+            const isCorrect = guess === gameState.bomb;
+            const isHigher = guess > gameState.bomb;
+            const isLower = guess < gameState.bomb;
+            
+            const historyItem = document.createElement('div');
+            historyItem.className = 'flex justify-between items-center py-3 border-b border-gray-100 last:border-0 transition-all duration-300 hover:bg-gray-50 rounded-lg p-2 history-item opacity-0 animate-slide-up';
+            historyItem.style.animationDelay = '0.1s';
+            
+            const playerInfo = document.createElement('div');
+            playerInfo.className = 'flex items-center';
+            
+            const playerColor = document.createElement('div');
+            playerColor.className = `w-7 h-7 rounded-full bg-${player.color} flex items-center justify-center text-white mr-2 shadow-md text-xs number-badge`;
+            playerColor.textContent = player.id + 1;
+            
+            const playerNameSpan = document.createElement('span');
+            playerNameSpan.className = `font-medium text-${player.color} text-sm`;
+            playerNameSpan.textContent = player.name;
+            
+            const guessNumber = document.createElement('span');
+            guessNumber.className = `font-bold ml-2 ${isCorrect ? 'text-secondary' : 'text-dark'} text-sm`;
+            guessNumber.textContent = guess;
+            
+            const result = document.createElement('span');
+            result.className = 'text-xs font-medium';
+            
+            if (isCorrect) {
+                result.className = 'text-xs font-bold text-secondary';
+                result.innerHTML = '<i class="fa fa-exclamation-circle mr-1"></i> 猜中了炸弹！';
+            } else {
+                result.innerHTML = isHigher 
+                    ? '<i class="fa fa-arrow-down mr-1 text-red-400"></i> 猜的数字太大了' 
+                    : '<i class="fa fa-arrow-up mr-1 text-green-400"></i> 猜的数字太小了';
+            }
+            
+            playerInfo.appendChild(playerColor);
+            playerInfo.appendChild(playerNameSpan);
+            playerInfo.appendChild(guessNumber);
+            
+            historyItem.appendChild(playerInfo);
+            historyItem.appendChild(result);
+            guessHistory.appendChild(historyItem);
+            
+            // 滚动到底部
+            guessHistory.scrollTop = guessHistory.scrollHeight;
+        }
+
+        // 清除猜测历史
+        function clearGuessHistory() {
+            guessHistory.innerHTML = '<p class="text-center text-neutral italic">游戏开始后，猜测记录将显示在这里</p>';
+        }
+
+        // 显示错误信息
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.classList.remove('hidden');
+            errorMessage.classList.add('animate-shake');
+            guessInput.classList.add('border-red-400');
+            guessInput.classList.remove('focus:border-primary');
+            guessInput.classList.add('focus:border-red-400');
+            
+            // 添加抖动动画
+            guessInput.classList.add('animate-shake');
+            setTimeout(() => {
+                guessInput.classList.remove('animate-shake');
+                errorMessage.classList.remove('animate-shake');
+            }, 500);
+        }
+
+        // 隐藏错误信息
+        function hideError() {
+            errorMessage.classList.add('hidden');
+            guessInput.classList.remove('border-red-400');
+            guessInput.classList.add('focus:border-primary');
+            guessInput.classList.remove('focus:border-red-400');
+        }
+
+        // 初始化
+        updatePlayerCount();
+        updatePlayerInputs();
+    </script>
+</body>
+</html>    
